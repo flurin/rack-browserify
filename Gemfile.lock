@@ -1,0 +1,16 @@
+PATH
+  remote: .
+  specs:
+    rack-browserify (0.0.1)
+      rack (>= 1.0.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rack (1.5.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rack-browserify!
