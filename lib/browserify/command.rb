@@ -2,17 +2,30 @@ require 'shellwords'
 
 module Browserify
   class Command
+
+    BROWSERIFY_PARAMS = [
+      [:entry, :string],
+      [:ignore, :string],
+      [:exclude, :string],
+      [:transform, :string],
+      [:command, :string],
+      [:standalone, :boolean],
+      [:debug, :boolean]
+    ]
+
     def initialize(options = {})
       @options = {
         :browserify_bin => nil,
         :type => :string
-      }.update(options)
+      }
+
+      @options = @options.update(options)
     end
 
     def call(file, options)
-      options = {}.update(@options).update(options)
+      
 
-      cmd = [self.browserify_bin]
+      cmd = build_command(options)
 
       if options[:type] == :string
         out = ""
@@ -27,6 +40,33 @@ module Browserify
         cmd << file
         `#{Shellwords.join(cmd)}`
       end
+    end
+
+    def build_command(options)
+      options = {}.update(@options).update(options)
+      cmd = [self.browserify_bin]
+
+      BROWSERIFY_PARAMS.each do |key, type|
+        next unless options.has_key?(key)
+
+        if options[key].kind_of?(Array)
+          options[key].each do |opt|
+            cmd += build_param(key, opt, type)
+          end
+        elsif options[key]
+          cmd += build_param(key, options[key], type)
+        end
+      end
+
+      cmd
+    end
+
+    def build_param(key, value, type = :string)
+      cmd = ["--#{key}"]
+      if type != :boolean
+        cmd << value.to_s
+      end
+      cmd
     end
 
     def browserify_bin

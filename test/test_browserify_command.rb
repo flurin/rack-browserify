@@ -20,6 +20,20 @@ class TestBrowserifyCommand < Test::Unit::TestCase
     assert @browserify.browserify_bin
   end
 
+  def test_param_simple_boolean
+    assert_equal ["--debug"], @browserify.build_command(:debug => true)[1..-1]
+    assert_equal [], @browserify.build_command(:debug => false)[1..-1]    
+  end
+
+  def test_param_simple_string
+    assert_equal ["--ignore", "t"], @browserify.build_command(:ignore => "t")[1..-1]
+    assert_equal ["--ignore", "true"], @browserify.build_command(:ignore => true)[1..-1]
+  end
+
+  def test_param_multiple_string
+    assert_equal ["--transform", "1", "--transform", "2"], @browserify.build_command(:transform => ["1", "2"])[1..-1]
+  end
+
   def test_call_with_file
     file = "test_console.js"
     output = @browserify.call(file, :type => :file)
